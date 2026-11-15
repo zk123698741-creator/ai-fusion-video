@@ -24,7 +24,15 @@ foreach ($dependency in $dependencies) {
     }
     $unpacked = Join-Path $Cache $dependency.name
     New-Item -ItemType Directory -Force $unpacked | Out-Null
-    & tar.exe -xf $archive -C $unpacked
+    if ([IO.Path]::GetExtension($archive) -eq '.7z') {
+        $sevenZip = Join-Path $env:ProgramFiles '7-Zip/7z.exe'
+        if (!(Test-Path -LiteralPath $sevenZip)) {
+            throw '7-Zip is required to extract the FFmpeg runtime'
+        }
+        & $sevenZip x $archive "-o$unpacked" -y -bso0 -bsp0
+    } else {
+        & tar.exe -xf $archive -C $unpacked
+    }
     if ($LASTEXITCODE -ne 0) {
         throw "Extraction failed: $($dependency.name)"
     }
