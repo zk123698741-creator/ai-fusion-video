@@ -1,19 +1,20 @@
-# 融光 Windows 免安装版
+# 融光 Windows 桌面版
 
-适用 Windows 10/11 x64。解压到 `C:\FusionVideo` 或 `D:\Apps\FusionVideo` 等纯英文、无空格可写目录，双击 `Start.cmd`，启动成功后自动打开浏览器。完整目录路径均须使用 ASCII 字符且不含空格；启动器会在创建数据前检查。首次启动按页面提示创建管理员，再配置模型服务商和 API Key。日常运行无需 Docker、Java、Node.js、MySQL 或 Redis 的系统安装。
+适用 Windows 10/11 x64。使用 EXE 安装包安装，或将免安装 ZIP 解压到纯英文、无空格可写目录，双击 `FusionVideo.exe`。软件在自己的桌面窗口中显示界面，无需外部浏览器。首次启动显示进度并初始化数据库；按页面提示创建管理员，再配置模型服务商和 API Key。日常运行无需安装 Docker、Java、Node.js、MySQL、Redis 或浏览器运行时。
 
-本包是“本机服务 + 浏览器界面”。应用、数据库、缓存均在本机运行，默认只监听 `127.0.0.1`。初始访问地址为 `http://127.0.0.1:18088`。
+桌面窗口内置 Electron，应用、数据库、缓存均在本机运行，默认只监听 `127.0.0.1`。关闭软件窗口会正常停止本机服务。模型服务仍需要联网及 API Key。
 
 | 入口 | 操作 |
 | --- | --- |
-| `Start.cmd` | 启动并打开界面；首次启动初始化数据库 |
+| `FusionVideo.exe` | 打开独立桌面窗口；首次启动初始化数据库 |
+| `Start.cmd` | 兼容入口，打开同一个桌面程序 |
 | `Stop.cmd` | 停止本包启动的服务，关闭浏览器后也可使用 |
 | `Update.cmd` | 检查上游正式 Release，有新版时编译并切换 |
 | `Rollback.cmd` | 恢复最近一次更新前的程序及数据快照 |
 
 ## 更新
 
-双击 `Update.cmd`。更新需要联网访问 GitHub、npm 和 Maven 仓库，并预留编译和备份空间。JDK、Node 和 npm 已随包附带，应用更新无需另装编译环境。执行期间保留命令窗口。
+先关闭桌面软件，再双击 `Update.cmd`。更新需要联网访问 GitHub、npm 和 Maven 仓库，并预留编译和备份空间。JDK、Node 和 npm 已随包附带，应用更新无需另装编译环境。执行期间保留命令窗口，完成后重新打开 `FusionVideo.exe`。桌面窗口和 Chromium 数据同样位于 `data/`，关闭后才能完整冷备份。
 
 1. 从上游 `releases/latest` 解析正式版本号，跳过相同或更低版本。
 2. 下载对应 Tag 源码，记录 SHA-256，按该版本锁文件安装依赖并构建前后端。此时旧应用继续运行。
@@ -47,7 +48,7 @@
 
 ## 版本与来源
 
-应用版本见 `current.txt` 指向的 `releases/版本目录/version.json`。通过 GitHub Actions 构建的包同时包含 `build-manifest.json`，记录实际源码提交及工具链。Windows 封装版本为 `windows.1`；`Update.cmd` 后续跟随版本号更高的上游正式 Release。网页构建步骤见源码中的 `windows/GITHUB-ACTIONS.md`。
+应用版本见 `current.txt` 指向的 `releases/版本目录/version.json`。通过 GitHub Actions 构建的包同时包含 `build-manifest.json`，记录实际源码提交及工具链。Windows 桌面封装版本为 `windows.2`；`Update.cmd` 后续跟随版本号更高的上游正式 Release。网页构建步骤见源码中的 `windows/GITHUB-ACTIONS.md`。
 
 内置 Temurin JDK 21.0.13+9、Node.js 24.18.0、MySQL Community 8.4.7、Redis Windows MSYS2 8.10.3、FFmpeg 9.0.2 essentials。原始许可证随各运行时目录保留。MySQL 使用的 Visual C++ 运行库取自本包的 Temurin JDK；对应许可位于 `runtime/java/legal/`。Redis 为社区 Windows 移植版。
 
@@ -82,5 +83,5 @@ AI 对话、图像和视频生成需要自行配置可用的模型服务；本�
 
 `FusionVideo-Windows-x64-版本号-Setup.exe` 提供安装向导、开始菜单和桌面快捷方式。按当前用户安装，无需管理员权限。选择无空格的英文目录；默认目录不符合要求时，可改为有写入权限的 `D:\FusionVideo`。
 
-安装包用于首次安装，拒绝覆盖已有程序或数据目录。已有版本使用 `Update.cmd` 更新，使用 `Rollback.cmd` 回滚。卸载前运行 `Stop.cmd`，卸载保留运行后生成的配置、数据库、媒体和备份。
+安装包拒绝直接覆盖运行中的旧程序。关闭软件并卸载旧版后，可重新安装到原目录，保留已有配置、数据库、媒体和备份。应用版本更新使用 `Update.cmd`，回滚使用 `Rollback.cmd`。桌面封装版本为 Windows wrapper 2，Electron 45.3.2；桌面封装升级通过新的安装包完成。
 
