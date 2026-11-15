@@ -12,28 +12,37 @@ $installer = $installers[0].FullName
 $arguments = @('/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/SP-',"/DIR=`"$InstallDir`"", "/LOG=`"$OutDir/install.log`"")
 $process = Start-Process -FilePath $installer -ArgumentList $arguments -PassThru -Wait -WindowStyle Hidden
 if ($process.ExitCode -ne 0) { throw "Installer failed: $($process.ExitCode)" }
-foreach ($file in @('Start.cmd','Update.cmd','Rollback.cmd','unins000.exe')) {
+foreach ($file in @('FusionVideo.exe','Start.cmd','Update.cmd','Rollback.cmd','unins000.exe')) {
     if (!(Test-Path -LiteralPath (Join-Path $InstallDir $file))) { throw "Installed file missing: $file" }
 }
 $desktop = [Environment]::GetFolderPath('Desktop')
 $programs = [Environment]::GetFolderPath('Programs')
 foreach ($shortcut in @("$desktop/FusionVideo.lnk", "$programs/FusionVideo/FusionVideo.lnk")) {
     if (!(Test-Path -LiteralPath $shortcut)) { throw "Shortcut missing: $shortcut" }
+    $link = (New-Object -ComObject WScript.Shell).CreateShortcut($shortcut)
+    if ($link.TargetPath -ne (Join-Path $InstallDir 'FusionVideo.exe')) { throw 'Shortcut does not target the desktop EXE' }
 }
 # A second setup must reject this installation instead of replacing its data.
 $second = Start-Process -FilePath $installer -ArgumentList $arguments -PassThru -Wait -WindowStyle Hidden
 if ($second.ExitCode -eq 0) { throw 'Installer unexpectedly overwrote an existing installation' }
-& "$PSScriptRoot/ci-smoke.ps1" -Bundle $InstallDir -ResultFile "$OutDir/smoke.json"
+& "$PSScriptRoot/ci-desktop-smoke.ps1" -Bundle $InstallDir -ResultFile "$OutDir/desktop-smoke.json"
 New-Item -ItemType Directory -Force "$InstallDir/data/media" | Out-Null
 $marker = Join-Path $InstallDir 'data/media/installer-preserve-test.txt'
 [IO.File]::WriteAllText($marker, 'keep-user-data')
 $uninstallArgs = @('/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART',"/LOG=`"$OutDir/uninstall.log`"")
 $uninstall = Start-Process -FilePath "$InstallDir/unins000.exe" -ArgumentList $uninstallArgs -PassThru -Wait -WindowStyle Hidden
 if ($uninstall.ExitCode -ne 0) { throw "Uninstaller failed: $($uninstall.ExitCode)" }
-if (Test-Path -LiteralPath "$InstallDir/Start.cmd") { throw 'Uninstaller left the installed launcher' }
+if (Test-Path -LiteralPath "$InstallDir/FusionVideo.exe") { throw 'Uninstaller left the installed launcher' }
 if (!(Test-Path -LiteralPath $marker) -or [IO.File]::ReadAllText($marker) -ne 'keep-user-data') {
     throw 'Uninstaller did not preserve user media'
 }
 if (!(Test-Path -LiteralPath "$InstallDir/config/windows.json")) { throw 'Uninstaller did not preserve configuration' }
-[ordered]@{ install = 'passed'; existingInstallGuard = 'passed'; startup = 'passed'; uninstall = 'passed'; userDataPreserved = $true } |
+# Reinstallation after uninstall must recover the kept data without overwriting it.
+$reinstall = Start-Process -FilePath $installer -ArgumentList $arguments -PassThru -Wait -WindowStyle Hidden
+if ($reinstall.ExitCode -ne 0 -or [IO.File]::ReadAllText($marker) -ne 'keep-user-data') {
+    throw 'Reinstallation failed to recover preserved data'
+}
+$removeAgain = Start-Process -FilePath "$InstallDir/unins000.exe" -ArgumentList $uninstallArgs -PassThru -Wait -WindowStyle Hidden
+if ($removeAgain.ExitCode -ne 0) { throw 'Final test uninstall failed' }
+[ordered]@{ install = 'passed'; existingInstallGuard = 'passed'; desktopWindow = 'passed'; uninstall = 'passed'; reinstallPreservesData = 'passed'; userDataPreserved = $true } |
     ConvertTo-Json | Set-Content -LiteralPath "$OutDir/installer-smoke.json" -Encoding utf8
