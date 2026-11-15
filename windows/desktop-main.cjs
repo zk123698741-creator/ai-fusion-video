@@ -106,6 +106,9 @@ async function startDesktop() {
     { label: '视图', submenu: [{ role: 'reload' }, { role: 'resetZoom' }, { role: 'zoomIn' }, { role: 'zoomOut' }] },
   ]));
   await window.loadFile(path.join(__dirname, 'desktop-loading.html'));
+  if (stopping) {
+    return;
+  }
   startup = command('start');
   await startup;
   if (stopping) {
