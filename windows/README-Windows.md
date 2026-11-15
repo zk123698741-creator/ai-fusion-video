@@ -78,3 +78,9 @@ node --test windows/transaction.test.mjs
 Windows 兼容处理：Redis 使用相对配置路径；JVM 显式指定本包套接字临时目录，避开 MSIX 启动器继承的 TEMP 重定向问题；Next.js 的 pnpm 运行时依赖物化并检查版本冲突，发行包无构建机目录链接。上游 MySQL 的 Windows 参数解析及 AgentScope 的嵌套 JAR URI 解析对非英文或空格路径存在限制，因此本封装在启动前检查并提示使用纯英文、无空格目录。任意中文、空格路径的完整支持属于后续兼容工作。
 
 AI 对话、图像和视频生成需要自行配置可用的模型服务；本包未内置服务商账户或 API Key。
+# EXE 安装包
+
+`FusionVideo-Windows-x64-版本号-Setup.exe` 提供安装向导、开始菜单和桌面快捷方式。按当前用户安装，无需管理员权限。选择无空格的英文目录；默认目录不符合要求时，可改为有写入权限的 `D:\FusionVideo`。
+
+安装包用于首次安装，拒绝覆盖已有程序或数据目录。已有版本使用 `Update.cmd` 更新，使用 `Rollback.cmd` 回滚。卸载前运行 `Stop.cmd`，卸载保留运行后生成的配置、数据库、媒体和备份。
+
