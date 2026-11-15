@@ -60,7 +60,7 @@ jobs:
             -Bundle "$env:RUNNER_TEMP/FusionVideo-Windows-x64" `
             -OutDir "$env:GITHUB_WORKSPACE/dist"
 
-      - name: Verify installer, startup, uninstall and data preservation
+      - name: Verify desktop window, shutdown, reinstall and data preservation
         run: |
           ./windows/ci-installer-smoke.ps1 `
             -OutDir "$env:GITHUB_WORKSPACE/dist" `
@@ -99,11 +99,13 @@ jobs:
           $installer = "dist/FusionVideo-Windows-x64-$env:APP_VERSION-Setup.exe"
           $notes = Join-Path $env:RUNNER_TEMP 'windows-release-notes.md'
           @"
-          Windows x64 ZIP and EXE installer of application $env:APP_VERSION.
+          Windows x64 standalone desktop application $env:APP_VERSION (Windows wrapper 2).
           Source commit: $env:GITHUB_SHA
-          Extract to an English path without spaces and run Start.cmd.
-          Or run the Setup.exe installer, then open the FusionVideo shortcut.
-          The installer is for a new folder. Use Update.cmd for existing installations.
+          Run the Setup.exe installer, then open the FusionVideo shortcut.
+          The app opens in its own desktop window and does not require an external browser.
+          Portable ZIP: extract to an English path without spaces and run FusionVideo.exe.
+          Close the desktop window to stop local services.
+          A previously uninstalled folder can be reinstalled while retaining its configuration and data.
           Uninstalling keeps generated configuration and user data.
           Update.cmd in this package uses the upstream source-build update channel.
           "@ | Set-Content -LiteralPath $notes -Encoding utf8
