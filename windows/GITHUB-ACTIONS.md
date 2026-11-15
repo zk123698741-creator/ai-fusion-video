@@ -9,7 +9,7 @@
 5. 点击 **Actions**；如果 Fork 显示启用工作流的提示，先启用。选择左侧 **Build Windows → Run workflow**。
 6. 保持默认分支。首次可以不勾选 `Also publish...`，然后点击绿色 **Run workflow**。
 7. 等待所有构建步骤成功，打开本次运行页面，向下找到 **Artifacts → FusionVideo-Windows-x64** 并下载。
-8. 解压下载的 Artifact，运行其中的 `FusionVideo-Windows-x64-版本号-Setup.exe` 安装；也可取出应用 ZIP，解压到英文且无空格的目录，再双击 `Start.cmd`。
+8. 解压下载的 Artifact，运行其中的 `FusionVideo-Windows-x64-版本号-Setup.exe` 安装；也可取出应用 ZIP，解压到英文且无空格的目录，再双击 `FusionVideo.exe`。
 
 Artifact 是 GitHub 提供的外层下载包，里面包含应用 ZIP、EXE 安装包、SHA256SUMS.txt、build-manifest.json 和启动、安装验证记录。完整安装路径须为英文 ASCII 且不含空格。
 
@@ -19,7 +19,7 @@ Artifact 是 GitHub 提供的外层下载包，里面包含应用 ZIP、EXE 安�
 
 构建、打包、启动检查全部通过后，工作流会向自己的 Fork 发布一个带唯一 `windows-v...` 标签的 Release，附件包含 Windows ZIP、EXE 安装包、校验文件和构建信息。使用内置 `GITHUB_TOKEN`；无需配置个人访问令牌、Docker Hub 账号或模型 API Key。`contents: write` 仅授予发布任务，构建任务使用读取权限。
 
-该 Release 不替换上游发布，也不设为仓库默认 latest。原仓库 Docker 工作流使用的版本标签规则与本工作流生成的 Windows 标签分开。
+该 Release 不替换上游发布，发布命令使用 `--latest=false`。原仓库 Docker 工作流使用的版本标签规则与本工作流生成的 Windows 标签分开。
 
 ## 后续构建新版
 
@@ -38,7 +38,8 @@ Artifact 是 GitHub 提供的外层下载包，里面包含应用 ZIP、EXE 安�
 - 打包时拒绝包含数据库、密码配置、日志、备份或构建机目录链接的目录。
 - 生成 ZIP 和校验值，并执行 ZIP 完整性检查。
 - 使用 Inno Setup 构建按当前用户安装的 EXE，建立桌面和开始菜单快捷方式。
-- 实际安装 EXE，验证拒绝覆盖已有目录，检查首次启动及正常停止，再卸载并验证媒体和配置保留。
+- 实际安装 EXE，验证快捷方式指向 FusionVideo.exe，启动独立 Electron 桌面窗口，检查渲染的初始化表单及 API，再关闭窗口验证服务退出。
+- 验证卸载保留媒体和配置，并实际重装到原目录检查数据保留。
 - 上传 Artifact；勾选发布时再创建 Release。
 
 ## 常见入口问题
@@ -60,3 +61,5 @@ Artifact 是 GitHub 提供的外层下载包，里面包含应用 ZIP、EXE 安�
 - https://docs.github.com/en/actions/how-tos/manage-workflow-runs/manually-run-a-workflow
 - https://docs.github.com/en/actions/tutorials/store-and-share-data
 - https://docs.github.com/en/actions/tutorials/authenticate-with-github_token
+
+桌面版内置 Electron，窗口内加载界面，关闭窗口停止本机服务。模型服务仍需联网及 API Key。更新应用前关闭桌面程序；桌面封装升级使用新安装包。
