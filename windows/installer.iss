@@ -27,7 +27,7 @@ OutputBaseFilename=FusionVideo-Windows-x64-{#AppVersion}-Setup
 Compression=lzma2/fast
 SolidCompression=yes
 WizardStyle=modern
-UninstallDisplayIcon={app}\runtime\node\node.exe
+UninstallDisplayIcon={app}\FusionVideo.exe
 CloseApplications=no
 RestartApplications=no
 
@@ -35,10 +35,10 @@ RestartApplications=no
 Source: "{#BundleDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
-Name: "{group}\FusionVideo"; Filename: "{app}\Start.cmd"; WorkingDir: "{app}"
+Name: "{group}\FusionVideo"; Filename: "{app}\FusionVideo.exe"; WorkingDir: "{app}"
 Name: "{group}\Update FusionVideo"; Filename: "{app}\Update.cmd"; WorkingDir: "{app}"
 Name: "{group}\Stop FusionVideo"; Filename: "{app}\Stop.cmd"; WorkingDir: "{app}"
-Name: "{autodesktop}\FusionVideo"; Filename: "{app}\Start.cmd"; WorkingDir: "{app}"
+Name: "{autodesktop}\FusionVideo"; Filename: "{app}\FusionVideo.exe"; WorkingDir: "{app}"
 
 [Code]
 function PrepareToInstall(var NeedsRestart: Boolean): String;
@@ -54,9 +54,15 @@ begin
       Result := 'Choose an English path without spaces, for example D:\FusionVideo.';
       Exit;
     end;
-  if FileExists(InstallDir + '\current.txt') or
-     DirExists(InstallDir + '\data') or DirExists(InstallDir + '\config') then
-    Result := 'This folder contains an existing installation or user data. Use Update.cmd to update it, or select a new empty folder.';
+  if FileExists(InstallDir + '\current.txt') then
+    Result := 'This folder contains an existing installation. Close it and uninstall the old program first; generated data will be kept.'
+  else if (DirExists(InstallDir + '\data') or DirExists(InstallDir + '\config')) and
+          not FileExists(InstallDir + '\config\windows.json') then
+    Result := 'This folder contains unrecognized data. Choose another folder.'
+  else if FileExists(InstallDir + '\.runtime\instance.lock') or
+          FileExists(InstallDir + '\.runtime\update.lock') or
+          FileExists(InstallDir + '\.runtime\update-journal.json') then
+    Result := 'Stop the local services and finish or roll back any update before reinstalling.';
 end;
 
 function InitializeUninstall(): Boolean;
