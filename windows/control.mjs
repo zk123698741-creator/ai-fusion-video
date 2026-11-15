@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import { spawn } from 'node:child_process';
-import { at, config, delay, healthy } from './common.mjs';
+import { at, config, delay, healthy, run } from './common.mjs';
 
 export async function startApp(openBrowser = false) {
   const c = config();
@@ -25,7 +25,15 @@ export async function startApp(openBrowser = false) {
   const url = `http://127.0.0.1:${c.port}`;
   console.log(`Fusion ready: ${url}`);
   if (openBrowser) {
-    spawn('rundll32.exe', ['url.dll,FileProtocolHandler', url], { windowsHide: true, stdio: 'ignore' }).unref();
+    try {
+      // START dispatches HTTP through the user's default browser association.
+      // The target contains only a fixed loopback host and a validated integer port.
+      await run(process.env.ComSpec, ['/d', '/s', '/c', `start "" "${url}"`], {
+        windowsVerbatimArguments: true, stdio: 'ignore',
+      });
+    } catch (error) {
+      throw new Error(`Fusion is running, but the browser could not open. Open ${url} manually. ${error.message}`);
+    }
   }
 }
 export async function stopApp() {
