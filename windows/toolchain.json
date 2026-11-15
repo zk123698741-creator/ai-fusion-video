@@ -1,0 +1,27 @@
+[
+  {
+    "name": "java", "archive": "jdk.zip", "folder": "jdk-21.0.13+9",
+    "url": "https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.13%2B9/OpenJDK21U-jdk_x64_windows_hotspot_21.0.13_9.zip",
+    "sha256": "A4DBAA05FCA4BD89D84584E58C459BD732EFEBB1722AF80AB13C6516832004F9"
+  },
+  {
+    "name": "node", "archive": "node.zip", "folder": "node-v24.18.0-win-x64",
+    "url": "https://nodejs.org/dist/v24.18.0/node-v24.18.0-win-x64.zip",
+    "sha256": "0AE68406B42D7725661DA979B1403EC9926DA205C6770827F33AAC9D8F26E821"
+  },
+  {
+    "name": "mysql", "archive": "mysql.zip", "folder": "mysql-8.4.7-winx64",
+    "url": "https://cdn.mysql.com/archives/mysql-8.4/mysql-8.4.7-winx64.zip",
+    "sha256": "FD9BDBD4B5A878D31C8E4067078BD60665B1B3C4677FA1F099416D194B458AFF"
+  },
+  {
+    "name": "redis", "archive": "redis.zip", "folder": "Redis-8.10.3-Windows-x64-msys2",
+    "url": "https://github.com/redis-windows/redis-windows/releases/download/8.10.3/Redis-8.10.3-Windows-x64-msys2.zip",
+    "sha256": "AF16DF340525B431E9EC8DABFD625D5E7A233F82805B5418819904EA909C447F"
+  },
+  {
+    "name": "ffmpeg", "archive": "ffmpeg.7z", "folder": "ffmpeg-9.0.2-essentials_build",
+    "url": "https://www.gyan.dev/ffmpeg/builds/packages/ffmpeg-9.0.2-essentials_build.7z",
+    "sha256": "4705843CCAAF54257C16AD90F3E952ECE33C17DF964ECF7BFDBB0F49C7171077"
+  }
+]
