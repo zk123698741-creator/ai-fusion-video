@@ -9,15 +9,15 @@
 5. 点击 **Actions**；如果 Fork 显示启用工作流的提示，先启用。选择左侧 **Build Windows → Run workflow**。
 6. 保持默认分支。首次可以不勾选 `Also publish...`，然后点击绿色 **Run workflow**。
 7. 等待所有构建步骤成功，打开本次运行页面，向下找到 **Artifacts → FusionVideo-Windows-x64** 并下载。
-8. 解压下载的 Artifact，取出其中的 `FusionVideo-Windows-x64-版本号.zip`，再次解压到 `C:\FusionVideo` 或 `D:\Apps\FusionVideo`，双击 `Start.cmd`。
+8. 解压下载的 Artifact，运行其中的 `FusionVideo-Windows-x64-版本号-Setup.exe` 安装；也可取出应用 ZIP，解压到英文且无空格的目录，再双击 `Start.cmd`。
 
-Artifact 是 GitHub 提供的外层下载包，里面包含应用 ZIP、SHA256SUMS.txt、build-manifest.json 和 smoke.json。完整安装路径须为英文 ASCII 且不含空格。
+Artifact 是 GitHub 提供的外层下载包，里面包含应用 ZIP、EXE 安装包、SHA256SUMS.txt、build-manifest.json 和启动、安装验证记录。完整安装路径须为英文 ASCII 且不含空格。
 
 ## 同时发布到 Releases
 
-在 **Run workflow** 时勾选 `Also publish the Windows ZIP to this repository's Releases`。
+在 **Run workflow** 时勾选 `Also publish the Windows ZIP and EXE installer to Releases`。
 
-构建、打包、启动检查全部通过后，工作流会向自己的 Fork 发布一个带唯一 `windows-v...` 标签的 Release，附件包含 Windows ZIP、校验文件和构建信息。使用内置 `GITHUB_TOKEN`；无需配置个人访问令牌、Docker Hub 账号或模型 API Key。`contents: write` 仅授予发布任务，构建任务使用读取权限。
+构建、打包、启动检查全部通过后，工作流会向自己的 Fork 发布一个带唯一 `windows-v...` 标签的 Release，附件包含 Windows ZIP、EXE 安装包、校验文件和构建信息。使用内置 `GITHUB_TOKEN`；无需配置个人访问令牌、Docker Hub 账号或模型 API Key。`contents: write` 仅授予发布任务，构建任务使用读取权限。
 
 该 Release 不替换上游发布，也不设为仓库默认 latest。原仓库 Docker 工作流使用的版本标签规则与本工作流生成的 Windows 标签分开。
 
@@ -37,7 +37,8 @@ Artifact 是 GitHub 提供的外层下载包，里面包含应用 ZIP、SHA256SU
 - 调用 `windows/bundle.ps1` 编译后端、前端并集成本机运行环境。
 - 打包时拒绝包含数据库、密码配置、日志、备份或构建机目录链接的目录。
 - 生成 ZIP 和校验值，并执行 ZIP 完整性检查。
-- 首次启动服务，检查初始化页面及后端状态，然后正常停止。
+- 使用 Inno Setup 构建按当前用户安装的 EXE，建立桌面和开始菜单快捷方式。
+- 实际安装 EXE，验证拒绝覆盖已有目录，检查首次启动及正常停止，再卸载并验证媒体和配置保留。
 - 上传 Artifact；勾选发布时再创建 Release。
 
 ## 常见入口问题
