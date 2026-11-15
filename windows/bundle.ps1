@@ -42,15 +42,16 @@ foreach ($dependency in $dependencies) {
     }
 }
 Copy-Item -LiteralPath "$Destination/runtime/java/bin/msvcp140.dll","$Destination/runtime/java/bin/vcruntime140.dll","$Destination/runtime/java/bin/vcruntime140_1.dll" -Destination "$Destination/runtime/mysql/bin"
-Copy-Item "$PSScriptRoot/*.mjs","$PSScriptRoot/*.ps1","$PSScriptRoot/*.json" "$Destination/windows"
+Copy-Item "$PSScriptRoot/*.mjs","$PSScriptRoot/*.cjs","$PSScriptRoot/*.html","$PSScriptRoot/*.ps1","$PSScriptRoot/*.json" "$Destination/windows"
 Copy-Item "$PSScriptRoot/*.cmd" $Destination
 Copy-Item "$PSScriptRoot/README-Windows.md" "$Destination/README-Windows.md"
 Copy-Item "$source/LICENSE" "$Destination/LICENSE-ai-fusion-video.txt"
 $package = Get-Content -LiteralPath "$source/ai-fusion-video-web/package.json" -Raw | ConvertFrom-Json
-$id = "$($package.version)-windows.1"
+$id = "$($package.version)-windows.2"
 & "$PSScriptRoot/build.ps1" -Source $source -Destination "$Destination/releases/$id" -Runtime "$Destination/runtime"
 if ($LASTEXITCODE -ne 0) {
     throw 'Application build failed'
 }
 [IO.File]::WriteAllText("$Destination/current.txt", $id)
+& "$PSScriptRoot/build-desktop.ps1" -Bundle $Destination -Cache $Cache
 Write-Output "Portable Windows build: $Destination"
