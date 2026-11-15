@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'">
+<title>融光 · 正在启动</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #f6f5f2; color: #292735; font: 16px "Segoe UI", "Microsoft YaHei", sans-serif; }
+  main { width: min(560px, 85vw); }
+  .mark { width: 54px; height: 54px; border-radius: 17px; background: #6251c5; color: white; display: grid; place-items: center; font-size: 27px; }
+  h1 { margin: 28px 0 12px; font-size: 34px; font-weight: 600; letter-spacing: -.8px; }
+  p { color: #77727e; line-height: 1.9; }
+  .progress { margin-top: 32px; height: 4px; background: #e4e0ed; overflow: hidden; border-radius: 3px; }
+  .progress::after { content: ""; display: block; height: 100%; width: 35%; background: #6251c5; animation: loading 1.5s ease-in-out infinite alternate; }
+  small { display: block; margin-top: 18px; color: #77727e; }
+  @keyframes loading { to { transform: translateX(185%); } }
+  @media (prefers-reduced-motion: reduce) { .progress::after { animation: none; } }
+</style>
+<main><div class="mark">融</div><h1>创作，从这里开始。</h1><p>正在启动本机创作环境。<br>首次启动需要初始化数据库，请稍候。</p><div class="progress" role="progressbar" aria-label="正在启动"></div><small>融光 FusionVideo · 桌面版</small></main>
+</html>
